@@ -9,7 +9,7 @@
 # File Name:   kali-linux-setup_tool.sh                   #
 ###########################################################
 
-# Makes the script more robust and helps ensure that it fails quickly and gracefully if errors occur
+# Makes the script more robust and helps ensure that it fails quickly and gracefully if an error occurs
 set -eo pipefail
 
 # Constants, and frequently used variables
