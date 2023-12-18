@@ -4,7 +4,7 @@ nosqlmap 2.Scanning https://github.com/codingo/NoSQLMap.git
 libssh-0.8.3_Authentication_Bypass 3.Exploitation https://github.com/hackerhouse-opensource/cve-2018-10933.git
 ms08-067 3.Exploitation https://github.com/andyacer/ms08_067.git
 ms17-010_Eternal_Exploits 3.Exploitation https://github.com/worawit/MS17-010.git
-samba-2.2.x_trans2root 3.Exploitation
+samba-2.2.x_trans2root 3.Exploitation https://github.com/KernelPan1k/trans2open-CVE-2003-0201.git
 ssh_badkeys 3.Exploitation https://github.com/rapid7/ssh-badkeys.git
 ssh_debian 3.Exploitation https://github.com/g0tmi1k/debian-ssh.git
 ALL_PRIV_PEASS-ng 4.Post_Exploitation https://github.com/carlospolop/PEASS-ng.git
