@@ -81,4 +81,4 @@ repo_name category url
 In all sections ensure that there are no spaces, as the spaces between them act as a delimiter within the script itself. Adding additional spaces in any individual section of your entry will result in failure to clone.
 
 ## WIP
-This script is still being actively worked on, therefore sections 4 and 5 on the main menu do not yet work. Also, whilst some modest debugging has taken place, there are likely to be a few snags here and there - if you find any, let me know!
+This script is still being actively worked on. Whilst some modest debugging has taken place, there are likely to be a few snags here and there - if you find any, let me know!
