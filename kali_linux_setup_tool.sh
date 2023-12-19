@@ -70,11 +70,12 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         -a|--all)
             show_banner=true
-            custom_desktop=true
             clone_git=true
+            git_action="clone"
             install_packages=true
+            package_action="add"
             sudo_pass=true
-            show_version=true
+            custom_desktop=true
             shift
         ;;
         -b|--banner)

@@ -235,4 +235,3 @@ alias clear_history="rm -f ~/.zsh_history && kill -9 $$"
 alias pyserve='python3 -m http.server 80'
 
 alias smbserver='python /usr/share/doc/python3-impacket/examples/smbserver.py -smb2support TEST .'
-ac
