@@ -1,5 +1,6 @@
 atftp
 bloodhound
+btop
 chisel
 crackmapexec
 crowbar
@@ -7,7 +8,6 @@ dsniff
 exploitdb
 gedit
 gobuster
-htop
 httptunnel
 ipcalc
 kerberoast
@@ -20,6 +20,7 @@ odat
 powercat
 powershell-empire
 pure-ftpd
+ranger
 rinetd
 rsh-client
 rusers
