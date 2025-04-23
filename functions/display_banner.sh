@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 
-###########################################################
-#                                                         #
-# Author: b3nn3tt@hbcomputersecurity.co.uk                #
-# Version: 1.0                                            #
-# Git: https://github.com/b3nn3tt                         #
-#                                                         #
-# File Name:   display_banner.sh                          #
-# Description: Prints the tool banner to the terminal     #
-#                                                         #
-###########################################################
+###############################################################################
+# File Name   : display_banner.sh                                             #
+# Author      : b3nn3tt@hbcomputersecurity.co.uk                              #
+# Version     : 1.2                                                           #
+# GitHub      : https://github.com/b3nn3tt                                    #
+#                                                                             #
+# Description :                                                               #
+# Displays the Kali Linux Setup Tool banner with version and tagline.        #
+###############################################################################
 
 display_banner() {
     echo
@@ -25,10 +24,17 @@ display_banner() {
     echo -e "\e[1;34m       /____/\___/\__/\__,_/ .___/    /_/  \____/\____/_/\e[0m"
     echo -e "\e[1;34m                          /_/\e[0m"
     echo
-    echo -e "\e[1;33;1m                        -----------------\e[0m"
-    echo -e "\e[1;33;1m                        |  Version 3.0  |\e[0m"
-    echo -e "\e[1;33;1m                        -----------------\e[0m"
+
+    # Tagline
+    echo -e "     \e[1;33mA tool to prepare Kali Linux for penetration testing.\e[0m"
     echo
-    echo -e "\e[1;33;1mDescription: A tool to prepare Kali Linux for penetration testing.\e[0m"
+
+    # Version box
+    echo -e "\e[1;33m                       -------------------\e[0m"
+    echo -e "\e[1;33m                       |    Version 3.0   |\e[0m"
+    echo -e "\e[1;33m                       -------------------\e[0m"
     echo
+
+    # Optional timestamp (commented by default)
+    # echo -e "               \e[2mSession started at $(date +"%Y-%m-%d %H:%M:%S")\e[0m"
 }

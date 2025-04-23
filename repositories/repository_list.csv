@@ -1,0 +1,33 @@
+name,category,url,description
+macos_hardening,2.Scanning,https://github.com/ataumo/macos_hardening.git,macOS hardening guide and auditing tool
+nmapAutomator,2.Scanning,https://github.com/21y4d/nmapAutomator.git,Wrapper for nmap to automate recon workflows
+nosqlmap,2.Scanning,https://github.com/codingo/NoSQLMap.git,Automated NoSQL injection and exploitation tool
+libssh-0.8.3_Authentication_Bypass,3.Exploitation,https://github.com/hackerhouse-opensource/cve-2018-10933.git,PoC for CVE-2018-10933 libssh auth bypass
+ms08-067,3.Exploitation,https://github.com/andyacer/ms08_067.git,Exploit for MS08-067 (NetAPI vulnerability)
+ms17-010_Eternal_Exploits,3.Exploitation,https://github.com/worawit/MS17-010.git,Eternal exploits for MS17-010 vulnerability
+samba-2.2.x_trans2root,3.Exploitation,https://github.com/KernelPan1k/trans2open-CVE-2003-0201.git,Exploit for Samba trans2open CVE-2003-0201
+ssh_badkeys,3.Exploitation,https://github.com/rapid7/ssh-badkeys.git,Known weak SSH key checker from Rapid7
+ssh_debian,3.Exploitation,https://github.com/g0tmi1k/debian-ssh.git,Collection of Debian OpenSSL weak keys
+ALL_PRIV_PEASS-ng,4.Post_Exploitation,https://github.com/carlospolop/PEASS-ng.git,Privilege escalation auditing scripts for Windows and Linux
+BROWSER_CREDS_SharpWeb,4.Post_Exploitation,https://github.com/djhohnstein/SharpWeb.git,Extract browser credentials using C#
+LIN_PRIV_linEnum,4.Post_Exploitation,https://github.com/rebootuser/LinEnum.git,Linux privilege escalation enumeration script
+LIN_PRIV_linux_exploit_suggestor,4.Post_Exploitation,https://github.com/mzet-/linux-exploit-suggester.git,Suggests Linux exploits based on system info
+LIN_PRIV_linux_exploit_suggestor_2,4.Post_Exploitation,https://github.com/jondonas/linux-exploit-suggester-2.git,Updated version of Linux exploit suggester
+LIN_PRIV_linux_priv_checker,4.Post_Exploitation,https://github.com/sleventyeleven/linuxprivchecker.git,Script to check for common Linux privilege issues
+LIN_PRIV_linux_smart_enumeration,4.Post_Exploitation,https://github.com/diego-treitos/linux-smart-enumeration.git,Smart enum script for Linux privilege escalation
+LIN_PRIV_mimipenguin,4.Post_Exploitation,https://github.com/huntergregal/mimipenguin.git,Dumps login credentials from Linux memory
+LIN_PRIV_pspy,4.Post_Exploitation,https://github.com/DominicBreuker/pspy.git,Process monitoring tool without root
+LIN_PRIV_EXPLOIT_baron_samedit_ubuntu_debian,4.Post_Exploitation,https://github.com/blasty/CVE-2021-3156.git,PoC for CVE-2021-3156 (Ubuntu/Debian)
+LIN_PRIV_EXPLOIT_baron_samedit_redhat_centos,4.Post_Exploitation,https://github.com/worawit/CVE-2021-3156,PoC for CVE-2021-3156 (RHEL/CentOS)
+WIN_ENUM_SessionGopher,4.Post_Exploitation,https://github.com/Arvanaghi/SessionGopher.git,PowerShell tool to extract session credentials
+WIN_ENUM_windows_sysinternals,4.Post_Exploitation,https://github.com/Sysinternals/sysinternals.git,Official Windows Sysinternals suite
+WIN_POST_powershell_script_encoder,4.Post_Exploitation,https://github.com/darkoperator/powershell_scripts.git,Encode PowerShell scripts for obfuscation
+WIN_PRIV_Seatbelt,4.Post_Exploitation,https://github.com/GhostPack/Seatbelt.git,Security audit tool for Windows
+WIN_PRIV_UACME,4.Post_Exploitation,https://github.com/hfiref0x/UACME.git,Bypass UAC in Windows via various techniques
+WIN_PRIV_Watson,4.Post_Exploitation,https://github.com/rasta-mouse/Watson.git,Enumerate missing patches for privilege escalation
+WIN_PRIV_Windows_Exploit_Suggester_NG,4.Post_Exploitation,https://github.com/bitsadmin/wesng.git,Suggests Windows exploits based on hotfixes
+WIN_PRIV_windows_privesc_check,4.Post_Exploitation,https://github.com/pentestmonkey/windows-privesc-check.git,PrivEsc checker for Windows systems
+WIN_PRIV_EXPLOIT_juicy_potato,4.Post_Exploitation,https://github.com/ohpe/juicy-potato.git,Exploit for local privilege escalation on Windows
+WIN_PRIV_EXPLOIT_kernel_exploits,4.Post_Exploitation,https://github.com/SecWiki/windows-kernel-exploits,Windows kernel exploit list and PoCs
+WIN_PRIV_EXPLOIT_lovely_potato_(automating_juicy_potato),4.Post_Exploitation,https://github.com/TsukiCTF/Lovely-Potato.git,Lovely Potato automates Juicy Potato exploit
+cyberchef,6.Custom_Tools,https://github.com/gchq/CyberChef.git,The Cyber Swiss Army Knife - web-based analysis tool

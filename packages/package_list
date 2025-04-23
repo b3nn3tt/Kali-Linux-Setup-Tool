@@ -14,6 +14,7 @@ kerberoast
 metasploit-framework
 mingw-w64
 ncat
+neowofetch
 nishang
 nuclei
 odat
@@ -24,12 +25,10 @@ ranger
 rinetd
 rsh-client
 rusers
-screenfetch
 seclists
 shellter
 sshuttle
 steghide
-veil
 wine
 wine32
 xdotool
