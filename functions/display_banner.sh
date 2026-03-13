@@ -1,40 +1,50 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# File Name   : display_banner.sh                                             #
-# Author      : b3nn3tt@hbcomputersecurity.co.uk                              #
-# Version     : 1.2                                                           #
-# GitHub      : https://github.com/b3nn3tt                                    #
-#                                                                             #
-# Description :                                                               #
-# Displays the Kali Linux Setup Tool banner with version and tagline.        #
+# File Name   : display_banner.sh
+# Author      : b3nn3tt@hbcomputersecurity.co.uk
+# Version     : 4.1
+# GitHub      : https://github.com/InfoSec-Research/
+#
+# Description :
+# Displays the Kali Linux Setup Tool banner with version and tagline.
+# Uses centralised colour constants and reads APP_VERSION dynamically.
 ###############################################################################
 
 display_banner() {
-    echo
-    echo -e "\e[1;34m               __ __      ___    __    _\e[0m"
-    echo -e "\e[1;34m              / //_/___ _/ (_)  / /   (_)___  __  ___  __\e[0m"
-    echo -e "\e[1;34m             / ,< / __ \`/ / /  / /   / / __ \/ / / / |/_/\e[0m"
-    echo -e "\e[1;34m            / /| / /_/ / / /  / /___/ / / / / /_/ />  <\e[0m"
-    echo -e "\e[1;34m           /_/ |_\__,_/_/_/  /_____/_/_/ /_/\__,_/_/|_|\e[0m"
-    echo -e "\e[1;34m          _____      __                 ______            __\e[0m"
-    echo -e "\e[1;34m         / ___/___  / /___  ______     /_  __/___  ____  / /\e[0m"
-    echo -e "\e[1;34m         \__ \/ _ \/ __/ / / / __ \     / / / __ \/ __ \/ /\e[0m"
-    echo -e "\e[1;34m        ___/ /  __/ /_/ /_/ / /_/ /    / / / /_/ / /_/ / /\e[0m"
-    echo -e "\e[1;34m       /____/\___/\__/\__,_/ .___/    /_/  \____/\____/_/\e[0m"
-    echo -e "\e[1;34m                          /_/\e[0m"
-    echo
 
-    # Tagline
-    echo -e "     \e[1;33mA tool to prepare Kali Linux for penetration testing.\e[0m"
-    echo
+    # Respect quiet mode
+    [[ "${QUIET:-false}" == true ]] && return 0
 
-    # Version box
-    echo -e "\e[1;33m                       -------------------\e[0m"
-    echo -e "\e[1;33m                       |    Version 3.0   |\e[0m"
-    echo -e "\e[1;33m                       -------------------\e[0m"
-    echo
+    printf "\n"
 
-    # Optional timestamp (commented by default)
-    # echo -e "               \e[2mSession started at $(date +"%Y-%m-%d %H:%M:%S")\e[0m"
+    printf "%b\n" "${CLR_BLUE}               __ __      ___    __    _${CLR_RESET}"
+    printf "%b\n" "${CLR_BLUE}              / //_/___ _/ (_)  / /   (_)___  __  ___  __${CLR_RESET}"
+    printf "%b\n" "${CLR_BLUE}             / ,< / __ \`/ / /  / /   / / __ \\/ / / / |/_/${CLR_RESET}"
+    printf "%b\n" "${CLR_BLUE}            / /| / /_/ / / /  / /___/ / / / / /_/ />  <${CLR_RESET}"
+    printf "%b\n" "${CLR_BLUE}           /_/ |_\\__,_/_/_/  /_____/_/_/ /_/\\__,_/_/|_|${CLR_RESET}"
+    printf "%b\n" "${CLR_BLUE}          _____      __                 ______            __${CLR_RESET}"
+    printf "%b\n" "${CLR_BLUE}         / ___/___  / /___  ______     /_  __/___  ____  / /${CLR_RESET}"
+    printf "%b\n" "${CLR_BLUE}         \\__ \\/ _ \\/ __/ / / / __ \\     / / / __ \\/ __ \\/ /${CLR_RESET}"
+    printf "%b\n" "${CLR_BLUE}        ___/ /  __/ /_/ /_/ / /_/ /    / / / /_/ / /_/ / /${CLR_RESET}"
+    printf "%b\n" "${CLR_BLUE}       /____/\\___/\\__/\\__,_/ .___/    /_/  \\____/\\____/_/${CLR_RESET}"
+    printf "%b\n" "${CLR_BLUE}                          /_/${CLR_RESET}"
+
+    printf "\n"
+    printf "%b\n" "     ${CLR_YELLOW}A tool to prepare Kali Linux for penetration testing.${CLR_RESET}"
+    printf "\n"
+
+    # Dynamic version box — width adapts to version string length
+    local ver_text="Version ${APP_VERSION}"
+    local ver_len=${#ver_text}
+    local box_width=$(( ver_len + 6 ))
+    local border
+
+    border=$(printf '─%.0s' $(seq 1 "$box_width"))
+
+    printf "%b\n" "                       ${CLR_YELLOW}┌${border}┐${CLR_RESET}"
+    printf "%b\n" "                       ${CLR_YELLOW}│   ${ver_text}   │${CLR_RESET}"
+    printf "%b\n" "                       ${CLR_YELLOW}└${border}┘${CLR_RESET}"
+
+    printf "\n"
 }

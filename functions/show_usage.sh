@@ -1,53 +1,100 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# File Name   : show_usage.sh                                                 #
-# Author      : b3nn3tt@hbcomputersecurity.co.uk                              #
-# Version     : 1.2                                                           #
-# GitHub      : https://github.com/b3nn3tt                                    #
-#                                                                             #
-# Description :                                                               #
-# Displays general usage and module-specific help for the setup tool.        #
+# File Name   : show_usage.sh
+# Author      : b3nn3tt@hbcomputersecurity.co.uk
+# Version     : 4.1
+# GitHub      : https://github.com/InfoSec-Research/
+#
+# Description :
+# Displays general usage and module-specific help for the setup tool.
 ###############################################################################
 
 show_usage() {
-    echo -e "\n\e[1;33;1mUsage: $0 [OPTIONS]\e[0m"
-    echo -e "\nOptions:"
-    echo -e "  -a, --all           Run all options (excludes viewing logfiles)"
-    echo -e "  -b, --banner        Display ASCII tool banner"
-    echo -e "  -d, --desktop       Configure Custom Desktop Experience"
-    echo -e "  -g, --git           Manage Git repositories (clone, edit, delete)"
-    echo -e "  -h, --help          Display this help message"
-    echo -e "  -l, --log           View log file"
-    echo -e "  -p, --packages      Manage package installation"
-    echo -e "  -s, --sudo          Configure sudo password behaviour"
-    echo -e "  -v, --version       Display tool version\n"
 
-    echo -e "\e[1;33;1mExamples:\e[0m\n"
-    echo -e "Install packages from the static package list:"
-    echo -e "\e[1;36m  $0 -p\e[0m or \e[1;36m$0 --packages add\e[0m\n"
-    echo -e "Edit Git repositories to be cloned:"
-    echo -e "\e[1;36m  $0 -g edit\e[0m or \e[1;36m$0 --git edit\e[0m\n"
-    echo -e "Run both Git cloning and package installation:"
-    echo -e "\e[1;36m  $0 -g -p\e[0m or \e[1;36m$0 --git clone --packages add\e[0m\n"
+    local cmd
+    cmd="$(basename "$0")"
+
+    printf "\n"
+    printf "%b\n" "${CLR_YELLOW}Usage:${CLR_RESET} ${cmd} [OPTIONS] [--dry-run] [--verbose] [--quiet]"
+    printf "\n"
+
+    printf "%b\n" "${CLR_BOLD}Module options:${CLR_RESET}"
+    printf "  -a, --all              Run all modules (excludes log viewer)\n"
+    printf "  -b, --banner           Display ASCII tool banner\n"
+    printf "  -d, --desktop          Configure custom desktop experience\n"
+    printf "  -g, --git <action>     Manage Git repositories (clone|edit|delete)\n"
+    printf "  -h, --help             Display this help message\n"
+    printf "  -l, --log              View the session log file\n"
+    printf "  -p, --packages <act>   Manage APT packages (install|edit)\n"
+    printf "  -s, --sudo <action>    Configure sudo behaviour (status|activate|disable)\n"
+    printf "  -u, --update           Force a full system update\n"
+    printf "  -v, --version          Display tool version\n"
+
+    printf "\n"
+
+    printf "%b\n" "${CLR_BOLD}Global modifiers:${CLR_RESET}"
+    printf "  --dry-run              Show what would happen without making changes\n"
+    printf "  --verbose              Enable debug-level output\n"
+    printf "  -q, --quiet            Suppress informational output (errors still shown)\n"
+    printf "  --paths                Show resolved directory paths and exit\n"
+
+    printf "\n"
+
+    printf "%b\n" "${CLR_BOLD}Examples:${CLR_RESET}"
+    printf "\n"
+
+    printf "  Install packages from the package list:\n"
+    printf "    %b%s -p install%b\n" "${CLR_CYAN}" "$cmd" "${CLR_RESET}"
+    printf "\n"
+
+    printf "  Clone all Git repos (dry run):\n"
+    printf "    %b%s -g clone --dry-run%b\n" "${CLR_CYAN}" "$cmd" "${CLR_RESET}"
+    printf "\n"
+
+    printf "  Run Git cloning and package installation together:\n"
+    printf "    %b%s -g clone -p install%b\n" "${CLR_CYAN}" "$cmd" "${CLR_RESET}"
+    printf "\n"
+
+    printf "  Check sudo status with verbose output:\n"
+    printf "    %b%s -s status --verbose%b\n" "${CLR_CYAN}" "$cmd" "${CLR_RESET}"
+    printf "\n"
 }
+
 
 show_git_usage() {
-    echo -e "\n\e[1;33m[?] Git Module Usage:\e[0m\n"
-    echo -e "  -g clone  | --git clone              Clone repositories from the list"
-    echo -e "  -g edit   | --git edit               Edit the repository list file"
-    echo -e "  -g delete | --git delete             (Coming soon) Delete managed repositories\n"
+
+    printf "\n"
+    msg_warn "Git module requires an action argument."
+    printf "\n"
+
+    printf "  -g clone  | --git clone     Clone/update repositories from the list\n"
+    printf "  -g edit   | --git edit      Edit the repository list (CSV)\n"
+    printf "  -g delete | --git delete    Remove managed repository directories\n"
+    printf "\n"
 }
+
 
 show_package_usage() {
-    echo -e "\n\e[1;33m[?] Package Module Usage:\e[0m\n"
-    echo -e "  -p install  | --packages install     Install APT packages from the list"
-    echo -e "  -p edit     | --packages edit        Edit the APT package list"
+
+    printf "\n"
+    msg_warn "Package module requires an action argument."
+    printf "\n"
+
+    printf "  -p install | --packages install    Install APT packages from the list\n"
+    printf "  -p edit    | --packages edit       Edit the APT package list\n"
+    printf "\n"
 }
 
+
 show_sudo_usage() {
-    echo -e "\n\e[1;33m[?] Sudo Module Usage:\e[0m\n"
-    echo -e "  -s status   | --sudo status          Show current sudo configuration"
-    echo -e "  -s activate | --sudo activate        Enable passwordless sudo"
-    echo -e "  -s disable  | --sudo disable         Disable passwordless sudo\n"
+
+    printf "\n"
+    msg_warn "Sudo module requires an action argument."
+    printf "\n"
+
+    printf "  -s status   | --sudo status       Show current sudo configuration\n"
+    printf "  -s activate | --sudo activate     Re-enable sudo password prompts\n"
+    printf "  -s disable  | --sudo disable      Disable sudo password (lab use only)\n"
+    printf "\n"
 }

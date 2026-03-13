@@ -1,142 +1,182 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# File Name   : git_import.sh                                                 #
-# Author      : b3nn3tt@hbcomputersecurity.co.uk                              #
-# Version     : 4.1                                                           #
-# GitHub      : https://github.com/InfoSec-Research/                          #
-#                                                                             #
-# Description :                                                               #
-# Clones or updates Git repositories listed in a structured CSV file.        #
-# CSV Format: name,category,url,description                                   #
-# Directory structure is auto-created under ~/github_repos/<category>/       #
+# File Name   : git_import.sh
+# Author      : b3nn3tt@hbcomputersecurity.co.uk
+# Version     : 4.1
+# GitHub      : https://github.com/InfoSec-Research/
+#
+# Description :
+# Clones or updates Git repositories listed in a structured CSV file.
+# CSV Format: name,category,url,description
+# Directory structure is auto-created under ~/github_repos/<category>/
 ###############################################################################
 
+readonly VALID_GIT_CATEGORIES=(
+    "1.OSINT"
+    "2.Scanning"
+    "3.Exploitation"
+    "4.Post_Exploitation"
+    "5.Exploit_Development"
+    "6.Custom_Tools"
+)
+
 git_import() {
-    readonly GIT="$HOME/github_repos"
-    readonly REPO_LIST="$BASE_DIR/repositories/repository_list.csv"
 
-    ##############################
-    # Validate CSV Categories
-    ##############################
+    local git_base="$HOME/github_repos"
+    local repo_list="${REPO_LIST}"
 
-    local VALID_CATEGORIES=(
-        "1.OSINT"
-        "2.Scanning"
-        "3.Exploitation"
-        "4.Post_Exploitation"
-        "5.Exploit_Development"
-        "6.Custom_Tools"
-    )
+    # ─── Validate CSV exists ──────────────────────────────────────────────
+    if [[ ! -f "$repo_list" ]]; then
+        msg_error "Repository list not found at: ${repo_list}"
+        msg_info  "Create one with format: name,category,url,description"
+        return 1
+    fi
 
-    local INVALID_ENTRIES=()
+    # ─── Validate categories ──────────────────────────────────────────────
+    local invalid_entries=()
+
     while IFS=',' read -r name category url description; do
-        [[ "$name" == "name" ]] && continue  # skip header
+
+        [[ "$name" == "name" ]] && continue
+        [[ -z "$name" ]] && continue
+
         local valid=false
-        for valid_cat in "${VALID_CATEGORIES[@]}"; do
+
+        for valid_cat in "${VALID_GIT_CATEGORIES[@]}"; do
             [[ "$category" == "$valid_cat" ]] && valid=true && break
         done
+
         if [[ "$valid" == false ]]; then
-            INVALID_ENTRIES+=("$name,$category,$url,$description")
+            invalid_entries+=("${name} → ${category}")
         fi
-    done < "$REPO_LIST"
 
-    if (( ${#INVALID_ENTRIES[@]} > 0 )); then
-        echo -e "\n\e[1;31m[!! ERROR !!]\e[0m The following entries have invalid categories:
-"
-        for entry in "${INVALID_ENTRIES[@]}"; do
-            echo -e "  → \e[91m$entry\e[0m"
+    done < "$repo_list"
+
+    if (( ${#invalid_entries[@]} > 0 )); then
+
+        msg_error "The following entries have invalid categories:"
+
+        for entry in "${invalid_entries[@]}"; do
+            printf "    %s\n" "$entry"
         done
-        echo -e "\nPlease update the CSV to match one of the following valid categories:"
-        for cat in "${VALID_CATEGORIES[@]}"; do
-            echo -e "  - $cat"
+
+        printf "\n"
+        msg_info "Valid categories:"
+
+        for cat in "${VALID_GIT_CATEGORIES[@]}"; do
+            printf "    %s\n" "$cat"
         done
-        echo
-        exit 1
+
+        return 1
     fi
 
-    ##############################
-    # Setup Git Directory Structure
-    ##############################
+    # ─── Ensure directory structure exists ─────────────────────────────────
+    msg_action "Ensuring Git directory structure exists..."
 
-    if [[ ! -d "$GIT" ]]; then
-        echo -e "\n\e[1;33;1m[-- CONFIGURING --]\e[0m Creating Git directory structure..."
-        sleep 1
-
-        for subdir in "${VALID_CATEGORIES[@]}"; do
-            echo -e "[+] Creating $GIT/$subdir"
-            mkdir -p "$GIT/$subdir"
-            sleep 0.5
-        done
-
-        echo -e "\n\e[1;32m[++ COMPLETE ++]\e[0m Git folder structure created."
-        sleep 1
-    fi
-
-    ##############################
-    # Preview Repos to be Cloned
-    ##############################
-
-    echo -e "\n\e[1;34mThe following Git repositories will be cloned or updated:\e[0m\n"
-    tail -n +2 "$REPO_LIST" | while IFS=',' read -r name dir repo_url description; do
-        [[ -z "$name" || -z "$dir" || -z "$repo_url" ]] && continue
-        echo -e "  [+] \e[1m$name\e[0m\n      ↳ \e[36m$dir\e[0m — \e[90m$description\e[0m\n"
+    for subdir in "${VALID_GIT_CATEGORIES[@]}"; do
+        run_cmd mkdir -p "${git_base}/${subdir}"
     done
 
-    echo -e "\nCloning will begin in 5 seconds — \e[1;31mpress any key to cancel\e[0m."
-    if read -n 1 -s -r -t 5; then
-        echo -e "\n[-] Operation cancelled."
-        exit 1
-    fi
+    msg_ok "Git folder structure ready."
 
-    echo -e "\n\e[1;33;1m[>> STARTING GIT OPERATIONS <<]\e[0m\n"
+    # ─── Preview repositories ──────────────────────────────────────────────
+    msg_info "The following repositories will be cloned or updated:"
+    printf "\n"
 
-    ##############################
-    # Clone or Update Repos
-    ##############################
+    while IFS=',' read -r name dir repo_url description; do
 
-    tail -n +2 "$REPO_LIST" | while IFS=',' read -r name dir repo_url description; do
+        [[ "$name" == "name" ]] && continue
         [[ -z "$name" || -z "$dir" || -z "$repo_url" ]] && continue
 
-        local target_dir="$GIT/$dir/$name"
+        printf "  %b%s%b  →  %b%s%b\n" \
+            "${CLR_BOLD}" "$name" "${CLR_RESET}" \
+            "${CLR_CYAN}" "$dir" "${CLR_RESET}"
+
+        printf "    %b%s%b\n" \
+            "${CLR_DIM_GREY}" "$description" "${CLR_RESET}"
+
+    done < "$repo_list"
+
+    printf "\n"
+
+    confirm_countdown 5 "Git operations will begin" || return 0
+
+    # ─── Clone or update repositories ─────────────────────────────────────
+    msg_action "Starting Git operations..."
+    printf "\n"
+
+    while IFS=',' read -r name dir repo_url description; do
+
+        [[ "$name" == "name" ]] && continue
+        [[ -z "$name" || -z "$dir" || -z "$repo_url" ]] && continue
+
+        local target_dir="${git_base}/${dir}/${name}"
 
         if [[ ! -d "$target_dir" ]]; then
-            echo -e "\n\e[1m$name\e[0m → \e[36m$dir\e[0m"
-            echo -e "↳ \e[90m$description\e[0m\n"
 
-            if git clone "$repo_url" "$target_dir"; then
-                echo -e "\e[1;32m[++ COMPLETE ++]\e[0m $name cloned successfully."
-                log_message "INFO" "GIT REPO CLONED: $name cloned successfully."
+            msg_action "Cloning ${CLR_BOLD}${name}${CLR_RESET}..."
+
+            if run_cmd git clone "$repo_url" "$target_dir"; then
+                msg_ok "${name} cloned successfully."
+                log_message "INFO" "GIT REPO CLONED: ${name}"
             else
-                echo -e "\e[1;31m[!! ERROR !!]\e[0m Failed to clone $name. Moving on..."
-                log_message "MINOR" "GIT CLONE ERROR: $name FAILED to clone."
+                msg_error "Failed to clone ${name} — skipping."
+                log_message "ERROR" "GIT CLONE FAILED: ${name}"
             fi
-        else
-            echo -e "\n\e[1m$name\e[0m → \e[36m$dir\e[0m"
-            echo -e "↳ \e[90m$description\e[0m"
-            echo -e "\e[1;36m[== UPDATING ==]\e[0m Repository already exists — checking for updates..."
 
-            pushd "$target_dir" >/dev/null
+        else
+
+            msg_action "Checking ${CLR_BOLD}${name}${CLR_RESET} for updates..."
+
+            # Respect --dry-run for pull operations
+            if [[ "${DRY_RUN:-false}" == true ]]; then
+                msg_info "${CLR_CYAN}[DRY RUN]${CLR_RESET} Would pull updates for ${name}"
+                continue
+            fi
+
+            pushd "$target_dir" >/dev/null || continue
 
             if git_output=$(git pull 2>&1); then
+
                 if echo "$git_output" | grep -q "Already up to date."; then
-                    echo -e "\e[1;35m[-- SKIPPED --]\e[0m $name is already up to date."
-                    log_message "INFO" "GIT REPO SKIPPED: $name already up to date."
+                    msg_skip "${name} is already up to date."
+                    log_message "INFO" "GIT REPO SKIPPED: ${name} (up to date)"
                 else
-                    echo -e "\e[1;32m[++ UPDATED ++]\e[0m $name updated successfully."
-                    log_message "INFO" "GIT REPO UPDATED: $name updated successfully."
+                    msg_ok "${name} updated successfully."
+                    log_message "INFO" "GIT REPO UPDATED: ${name}"
                 fi
+
             else
-                echo -e "\e[1;31m[!! ERROR !!]\e[0m Failed to update $name."
-                log_message "MINOR" "GIT UPDATE ERROR: $name FAILED to update."
+                msg_error "Failed to update ${name}."
+                log_message "ERROR" "GIT UPDATE FAILED: ${name}"
             fi
 
-            popd >/dev/null
+            popd >/dev/null || true
         fi
 
-        sleep 1
-    done
+    done < "$repo_list"
 
-    echo -e "\n\e[1;32m[++ COMPLETE ++]\e[0m Git operations completed."
-    sleep 2
+    msg_ok "Git operations completed."
+}
+
+
+git_delete() {
+
+    local git_base="$HOME/github_repos"
+
+    if [[ ! -d "$git_base" ]]; then
+        msg_warn "No Git repository directory found at ${git_base}. Nothing to delete."
+        return 0
+    fi
+
+    msg_warn "This will ${CLR_RED}permanently delete${CLR_RESET} all cloned repositories in:"
+    printf "    %s\n\n" "${git_base}"
+
+    confirm_countdown 5 "Deletion will begin" || return 0
+
+    run_cmd rm -rf "$git_base"
+
+    msg_ok "All managed repositories deleted."
+    log_message "WARNING" "GIT REPOS DELETED: ${git_base} removed."
 }

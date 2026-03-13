@@ -1,91 +1,87 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# File Name   : package_install.sh                                            #
-# Author      : b3nn3tt@hbcomputersecurity.co.uk                              #
-# Version     : 2.1                                                           #
-# GitHub      : https://github.com/b3nn3tt                                    #
-#                                                                             #
-# Description :                                                               #
-# Installs APT packages listed in a static file, with idempotency checks.    #
-# Automatically adds i386 architecture if not present.                       #
-# Logs success/failure and handles missing packages gracefully.              #
+# File Name   : package_install.sh                                            
+# Author      : b3nn3tt@hbcomputersecurity.co.uk                              
+# Version     : 4.0                                                           
+# GitHub      : https://github.com/InfoSec-Research/                          
+#                                                                             
+# Description :                                                               
+# Installs APT packages listed in a static file, with idempotency checks.    
+# Automatically adds i386 architecture if not present.                       
 ###############################################################################
 
 package_install() {
+    local package_list="${PACKAGE_LIST}"
 
-    local PACKAGE_LIST="$BASE_DIR/packages/package_list"
-
-    # Ensure the APT package list exists
-    if [[ ! -f "$PACKAGE_LIST" ]]; then
-        echo -e "\n\e[1;35m[!! MISSING PACKAGE LIST !!]\e[0m"
-        echo -e "Expected a plaintext list of packages at:\n  \e[1;36m$PACKAGE_LIST\e[0m"
-        exit 1
+    # ─── Validate package list exists ─────────────────────────────────────
+    if [[ ! -f "$package_list" ]]; then
+        msg_error "Package list not found at: ${package_list}"
+        msg_info  "Create a plaintext file with one package name per line."
+        return 1
     fi
 
-    ##############################
-    # Check i386 Architecture
-    ##############################
+    # ─── Check i386 architecture ──────────────────────────────────────────
+    msg_action "Checking i386 architecture support..."
 
-    echo -e "\n\e[1;33;1m[.. CHECKING ..]\e[0m Checking if i386 architecture is enabled..."
-    sleep 1
-    if dpkg --print-foreign-architectures | grep -q i386; then
-        echo -e "\e[1;35m[-- SKIPPING --]\e[0m i386 support already present."
+    if dpkg --print-foreign-architectures 2>/dev/null | grep -q i386; then
+        msg_skip "i386 support already enabled."
     else
-        echo -e "\n\e[1;31m[!! NOT FOUND !!]\e[0m i386 architecture missing — installing now..."
-        sudo dpkg --add-architecture i386
-        sudo apt update
-        echo -e "\n\e[1;32m[++ COMPLETE ++]\e[0m i386 support added."
-        log_message "INFO" "ARCHITECTURE SUPPORT INSTALLED: i386"
+        msg_action "Adding i386 architecture..."
+        run_cmd sudo dpkg --add-architecture i386
+        run_cmd sudo apt update
+        msg_ok "i386 support added."
+        log_message "INFO" "ARCHITECTURE: i386 support installed."
     fi
 
-    ##############################
-    # Preview Packages to Install
-    ##############################
+    # ─── Preview packages ─────────────────────────────────────────────────
+    echo ""
+    msg_info "The following APT packages will be installed:"
+    echo ""
+    while IFS= read -r package || [[ -n "$package" ]]; do
+        [[ -z "$package" || "$package" =~ ^[[:space:]]*# ]] && continue
+        echo "    ${package}"
+    done < "$package_list"
+    echo ""
 
-    echo -e "\n\e[1;34mThe following APT packages will be installed:\e[0m"
-    while IFS= read -r package; do
-        [[ -n "$package" ]] && echo -e "  [+] $package"
-    done < "$PACKAGE_LIST"
+    confirm_countdown 5 "Package installation will begin" || return 0
 
-    echo -e "\nInstallation will begin in 5 seconds — \e[1;31mpress any key to cancel\e[0m."
-    if read -n 1 -s -r -t 5; then
-        echo -e "\n[-] Installation aborted."
-        exit 1
-    fi
+    # ─── Install packages ─────────────────────────────────────────────────
+    msg_action "Starting package installation..."
+    echo ""
 
-    echo -e "\n\e[1;33;1m[>> STARTING INSTALLATION <<]\e[0m\n"
+    local installed=0
+    local skipped=0
+    local failed=0
 
-    ##############################
-    # Install APT Packages
-    ##############################
+    while IFS= read -r required_package || [[ -n "$required_package" ]]; do
+        # Skip blank lines and comments
+        [[ -z "$required_package" || "$required_package" =~ ^[[:space:]]*# ]] && continue
 
-    while IFS= read -r required_package; do
-        [[ -z "$required_package" ]] && continue
+        # Trim whitespace
+        required_package="$(echo "$required_package" | xargs)"
 
-        echo -e "\n\e[1;33;1m[.. CHECKING ..]\e[0m Verifying $required_package..."
-        sleep 1
+        msg_action "Checking ${CLR_BOLD}${required_package}${CLR_RESET}..."
 
         if dpkg-query -W --showformat='${Status}\n' "$required_package" 2>/dev/null | grep -q "install ok installed"; then
-            echo -e "\e[1;35m[-- SKIPPING --]\e[0m $required_package is already installed."
+            msg_skip "${required_package} is already installed."
+            (( skipped++ ))
         else
-            echo -e "\e[1;31m[!! INSTALLING !!]\e[0m $required_package is not installed — proceeding..."
-            sleep 1
-            if sudo apt install -y "$required_package"; then
-                echo -e "\n\e[1;32m[++ COMPLETE ++]\e[0m $required_package installed successfully."
-                log_message "INFO" "PACKAGE INSTALLED: $required_package"
+            if run_cmd sudo apt install -y "$required_package"; then
+                msg_ok "${required_package} installed successfully."
+                log_message "INFO" "PACKAGE INSTALLED: ${required_package}"
+                (( installed++ ))
             else
-                echo -e "\n\e[1;31m[!! FAILED !!]\e[0m Failed to install $required_package — skipping."
-                log_message "ERROR" "INSTALL FAILED: $required_package could not be installed."
+                msg_error "Failed to install ${required_package} — skipping."
+                log_message "ERROR" "INSTALL FAILED: ${required_package}"
+                (( failed++ ))
             fi
         fi
-        sleep 1
-    done < "$PACKAGE_LIST"
+    done < "$package_list"
 
-    ##############################
-    # Final Completion Message
-    ##############################
-
-    echo -e "\n\e[1;32m[++ PROCESS COMPLETE ++]\e[0m All listed APT packages have been processed.\n"
-    sleep 2
+    # ─── Summary ──────────────────────────────────────────────────────────
+    echo ""
+    msg_ok "Package operations complete."
+    msg_info "  Installed: ${installed}  |  Skipped: ${skipped}  |  Failed: ${failed}"
+    echo ""
 }
