@@ -287,8 +287,6 @@ Valid categories:
 **b3nn3tt**
 b3nn3tt@hbcomputersecurity.co.uk
 
-GitHub: [https://github.com/InfoSec-Research/](https://github.com/InfoSec-Research/)
-
 ---
 
 ## Project Goals
