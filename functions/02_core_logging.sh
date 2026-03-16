@@ -143,6 +143,15 @@ get_last_update_timestamp() {
 
 
 # Returns:
+#   0 → no previous update has ever been recorded (first run)
+#   1 → an update has been recorded previously
+
+is_first_run() {
+    [[ ! -f "$UPDATE_STAMP_FILE" ]]
+}
+
+
+# Returns:
 #   0 → update required
 #   1 → update not required
 

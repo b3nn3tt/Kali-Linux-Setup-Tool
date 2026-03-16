@@ -82,7 +82,7 @@ install: check-root
 
 	# Install templates
 	@if [ -d templates ] && ls templates/* 1>/dev/null 2>&1; then \
-		cp templates/* $(TPL_DIR)/; \
+		cp -r templates/* $(TPL_DIR)/; \
 		echo "  [+] Installed templates to $(TPL_DIR)"; \
 	else \
 		echo "  [--] No templates to install"; \

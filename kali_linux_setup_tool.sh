@@ -158,6 +158,7 @@ declare -A MODULES=(
     [git]=false
     [log]=false
     [packages]=false
+    [shell]=false
     [sudo]=false
     [version]=false
     [update]=false
@@ -181,6 +182,8 @@ _parse_cli() {
                 MODULE_ACTIONS[git]="clone"
                 MODULES[packages]=true
                 MODULE_ACTIONS[packages]="install"
+                MODULES[shell]=true
+                MODULE_ACTIONS[shell]="install"
                 MODULES[sudo]=true
                 MODULE_ACTIONS[sudo]="status"
                 MODULES[version]=true
@@ -225,6 +228,17 @@ _parse_cli() {
                     shift 2
                 else
                     show_package_usage
+                    exit 1
+                fi
+                ;;
+
+            -r|--rcsetup)
+                MODULES[shell]=true
+                if [[ $# -gt 1 && ! "$2" =~ ^- ]]; then
+                    MODULE_ACTIONS[shell]="$2"
+                    shift 2
+                else
+                    show_shell_usage
                     exit 1
                 fi
                 ;;
@@ -312,6 +326,21 @@ fi
 
 
 ##############################
+#  UP-FRONT INTERACTIVE      #
+#  PROMPTS (for --all mode)  #
+##############################
+
+# When --all is used, gather any interactive choices before modules run
+# so the user isn't interrupted mid-flow.
+# Only prompt when the action is "install" (interactive) — explicit actions
+# (install-user, install-all) and non-install actions (edit, remove) skip this.
+
+if [[ "${MODULES[shell]}" == true && "${MODULE_ACTIONS[shell]:-}" == "install" && -z "${SHELL_CUSTOM_SCOPE}" ]]; then
+    shell_customisation_prompt_scope
+fi
+
+
+##############################
 #    CHECK FOR UPDATES       #
 ##############################
 
@@ -320,7 +349,20 @@ if [[ "${MODULES[update]}" == true ]]; then
         msg_error "System update failed."
     fi
 elif [[ "${QUIET}" != true && "${DRY_RUN}" != true ]]; then
-    if is_update_due; then
+
+    if is_first_run; then
+        # First run — no update has ever been recorded; insist on running one
+        msg_warn "No previous system update recorded — this appears to be a first run."
+        printf "  A full system update is required before continuing.\n"
+        printf "\n"
+
+        if ! perform_system_update; then
+            msg_error "System update failed."
+            exit 1
+        fi
+
+    elif is_update_due; then
+        # Stamp file exists but is older than 7 days — recommend but don't force
         msg_warn "It has been over 7 days since the last system update."
         printf "  A full update is recommended before continuing.\n"
         printf "\n"
@@ -333,6 +375,7 @@ elif [[ "${QUIET}" != true && "${DRY_RUN}" != true ]]; then
             msg_info "Skipping update — continuing with current packages."
         fi
     fi
+
 fi
 
 
@@ -438,6 +481,44 @@ if [[ "${MODULES[sudo]}" == true ]]; then
             ;;
     esac
     MODULES[sudo]=false
+fi
+
+# ─── Shell customisation ────────────────────────────────────────────────────
+if [[ "${MODULES[shell]}" == true ]]; then
+    print_section "Shell Customisation"
+
+    case "${MODULE_ACTIONS[shell]:-}" in
+        install)
+            if ! shell_customisation_install; then
+                msg_error "Shell customisation module failed."
+            fi
+            ;;
+        install-user)
+            SHELL_CUSTOM_SCOPE="user"
+            if ! shell_customisation_install; then
+                msg_error "Shell customisation module failed."
+            fi
+            ;;
+        install-all)
+            SHELL_CUSTOM_SCOPE="all"
+            if ! shell_customisation_install; then
+                msg_error "Shell customisation module failed."
+            fi
+            ;;
+        edit)
+            shell_customisation_edit
+            ;;
+        remove)
+            if ! shell_customisation_remove; then
+                msg_error "Shell customisation removal failed."
+            fi
+            ;;
+        *)
+            msg_error "Unknown shell action: ${MODULE_ACTIONS[shell]:-<none>}"
+            show_shell_usage
+            ;;
+    esac
+    MODULES[shell]=false
 fi
 
 # ─── Desktop customisation ───────────────────────────────────────────────────

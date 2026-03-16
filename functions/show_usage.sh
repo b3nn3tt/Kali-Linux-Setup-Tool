@@ -27,6 +27,7 @@ show_usage() {
     printf "  -h, --help             Display this help message\n"
     printf "  -l, --log              View the session log file\n"
     printf "  -p, --packages <act>   Manage APT packages (install|edit)\n"
+    printf "  -r, --rcsetup <act>   Manage zsh shell customisation (install|edit|remove)\n"
     printf "  -s, --sudo <action>    Configure sudo behaviour (status|activate|disable)\n"
     printf "  -u, --update           Force a full system update\n"
     printf "  -v, --version          Display tool version\n"
@@ -96,5 +97,20 @@ show_sudo_usage() {
     printf "  -s status   | --sudo status       Show current sudo configuration\n"
     printf "  -s activate | --sudo activate     Re-enable sudo password prompts\n"
     printf "  -s disable  | --sudo disable      Disable sudo password (lab use only)\n"
+    printf "\n"
+}
+
+
+show_shell_usage() {
+
+    printf "\n"
+    msg_warn "Shell customisation module requires an action argument."
+    printf "\n"
+
+    printf "  -r install      | --rcsetup install       Deploy snippets (asks: user or both)\n"
+    printf "  -r install-user | --rcsetup install-user   Deploy snippets for current user only\n"
+    printf "  -r install-all  | --rcsetup install-all    Deploy snippets for current user + root\n"
+    printf "  -r edit         | --rcsetup edit            Edit deployed snippet files\n"
+    printf "  -r remove       | --rcsetup remove          Remove snippets and sourcing block\n"
     printf "\n"
 }
