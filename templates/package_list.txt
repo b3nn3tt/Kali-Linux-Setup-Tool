@@ -23,6 +23,7 @@ ncat
 neowofetch
 nishang
 nuclei
+obsidian
 odat
 oscanner
 powercat
