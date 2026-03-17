@@ -12,6 +12,8 @@ feroxbuster
 freerdp3-dev
 gedit
 git-cola
+gitrob
+gitleaks
 gobuster
 httptunnel
 impacket-scripts
