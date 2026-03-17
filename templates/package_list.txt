@@ -38,6 +38,7 @@ shellter
 sipvicious
 sshuttle
 steghide
+tesseract-ocr
 wine
 wine32
 xdotool
